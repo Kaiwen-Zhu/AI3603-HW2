@@ -150,11 +150,9 @@ def plot_Q_table(file_path, save=0):
             (x + 0.25, y + 0.8), (x + 0.55, y + 0.4),
             (x + 0.25, y + 0.1), (x       , y + 0.4)
         ]
-        fontsize = 8
-        dig = 1
         for i in range(4):
-            plt.text(text_pos[i][0], text_pos[i][1], s=round(vals[i],dig),
-                fontsize=fontsize, color=t_color(vals[i]))
+            plt.text(text_pos[i][0], text_pos[i][1], s=round(vals[i],1),
+                fontsize=8, color=t_color(vals[i]))
         
         # fill color
         mapQ = lambda val: (val - graduation[0][0]) / (
@@ -175,43 +173,57 @@ def plot_Q_table(file_path, save=0):
         plt.show()
 
 
-def plot_Q_table_dist(file_path, base_file_path, save=0):
+def plot_Q_table_dist(file_path, save=0):
     with open(file_path, 'rb') as f:
         Q_table = pkl.load(f)
-    with open(base_file_path, 'rb') as f:
-        base_Q_table = pkl.load(f)
 
-    for key1 in Q_table.keys():
-        for key2 in Q_table[key1].keys():
-            Q_table[key1][key2] = abs(Q_table[key1][key2] - base_Q_table[key1][key2])
+    def r(s, a, gamma=0.9):
+        x, y = s%12, 3 - s//12
+        des = (11, 0)
+        if a == 0:
+            y = min(y+1, 3)
+        elif a == 1:
+            x = min(x+1, 11)
+        elif a == 2:
+            y = max(y-1, 0)
+        else:
+            x = max(x-1, 0)
+        if y == 0 and x > 0:
+            return -100 - (1 - gamma**13) / (1 - gamma)
+        leng = abs(des[0] - x) + abs(des[1] - y) + 1
+        return - (1 - gamma**leng) / (1 - gamma)
 
-    if save == 0:
-        plt.figure(figsize=(15, 5))
-    else:
-        plt.figure(figsize=(30, 10))
-    ax = plt.gca()
+    for s in Q_table.keys():
+        for a in Q_table[s].keys():
+            # print("r({},{})={}, Q({},{})={}, rate={}".format(
+            #     s, a, r(s,a), s, a, Q_table[s][a],
+            #     round((Q_table[s][a] - r(s, a)) / r(s, a) * 100)))
+            Q_table[s][a] = round((Q_table[s][a] - r(s, a)) / r(s, a) * 100)
+
+    plt.figure(figsize=(12, 4))
 
     # set the axes
     plt.ylim(0, 4)
     plt.xlim(0, 12)
-    plt.grid(True)
-    x_major_locator = MultipleLocator(1)
-    y_major_locator = MultipleLocator(1)
-    ax.xaxis.set_major_locator(x_major_locator)
-    ax.yaxis.set_major_locator(y_major_locator)
-    ax.set_aspect(1)
+    
+    plt.xticks(ticks=np.arange(0.5, 12), labels=np.arange(1, 13))
+    plt.yticks(ticks=np.arange(0.5, 4), labels=np.arange(1, 5))
+    plt.gca().set_aspect(1)
+
+    plt.hlines(np.arange(5), xmin=0, xmax=12, colors='gray', lw=1)
+    plt.vlines(np.arange(13), ymin=0, ymax=4, colors='gray', lw=1)
 
     plt.fill([1,1,11,11], [0,1,1,0], color='k')  # draw the cliff
 
     graduation = [
-        (0,   (0x80/255, 0,        0x80/255)),   # purple
-        (1,   (0x41/255, 0x69/255, 0xe1/255)),  # royal blue
-        (2,   (0,        1,        0x7f/255)),  # spring green
-        (5,  (1,        1,        0       )),  # yellow
-        (10, (1,        0x8c/255, 0       )),  # dark orange
-        (20, (1,        0,        0       ))  # red
+        (0,   (0x80/255, 0,        0x80/255)),  # purple
+        (5,   (0x41/255, 0x69/255, 0xe1/255)),  # royal blue
+        (10,  (0,        1,        0x7f/255)),  # spring green
+        (20,  (1,        1,        0       )),  # yellow
+        (50,  (1,        0x8c/255, 0       )),  # dark orange
+        (100, (1,        0,        0       ))   # red
     ]
-    my_cmap = draw_colorbar(graduation, 0, 20)
+    my_cmap = draw_colorbar(graduation, 0, 100)
 
     for state, vals in Q_table.items():
         if state == 47:
@@ -225,16 +237,14 @@ def plot_Q_table_dist(file_path, base_file_path, save=0):
         ]
 
         # mark Q-value
-        t_color = lambda val: 'w' if val <= 1.5 else 'k'
+        t_color = lambda val: 'w' if val <= 6 else 'k'
         text_pos = [
             (x + 0.25, y + 0.8), (x + 0.55, y + 0.4),
-            (x + 0.25, y + 0.1), (x       , y + 0.4)
+            (x + 0.25, y + 0.1), (x      , y + 0.4)
         ]
-        fontsize = 8 if save == 0 else 16
-        dig = 1 if save == 0 else 2
         for i in range(4):
-            plt.text(text_pos[i][0], text_pos[i][1], s=round(vals[i],dig),
-                fontsize=fontsize, color=t_color(vals[i]))
+            plt.text(text_pos[i][0], text_pos[i][1], s="{}%".format(round(vals[i],1)),
+                fontsize=7, color=t_color(vals[i]))
         
         # fill color
         mapQ = lambda val: (val - graduation[0][0]) / (
@@ -244,7 +254,7 @@ def plot_Q_table_dist(file_path, base_file_path, save=0):
     
     if save:
         img_path = file_path.replace('Q', 'dist').replace('pkl', 'png')
-        plt.savefig(img_path, bbox_inches='tight')
+        plt.savefig(img_path, bbox_inches='tight', dpi=200)
         plt.close()
     else:
         plt.show()
@@ -257,7 +267,7 @@ def plot_conv(dirname, save=0):
         vals = [float(val) for val in vals]
 
         focus = list(map(int, filepath[filepath.index('\\')+1 : filepath.index('.')].split('_')))
-        path = [[24,1], [30,1], [35,2]]
+        path = [[24,1], [30,1]]
         ls = '--' if focus in path else '-'
         plt.plot(vals, label="Q({},{})".format(str(focus[0]), str(focus[1])), linestyle=ls)
         plt.xlabel('episode')
@@ -274,6 +284,7 @@ def plot_conv(dirname, save=0):
 
 
 if __name__ == '__main__':
-    plot_reward_eps_path("sarsa_9_1_9999_86981", save=1)
-    plot_Q_table("sarsa_9_1_9999_86981/Q_999.pkl", save=1)
-    plot_conv("sarsa_9_1_9999_86981", save=1)
+    # plot_reward_eps_path("sarsa_9_1_9999_86981", save=1)
+    # plot_Q_table("sarsa_9_1_9999_86981/Q_999.pkl", save=1)
+    plot_conv("2000_sarsa_9_1_9999_130318", save=1)
+    # plot_Q_table_dist("sarsa_9_1_9999_86981/Q_999.pkl", save=1)

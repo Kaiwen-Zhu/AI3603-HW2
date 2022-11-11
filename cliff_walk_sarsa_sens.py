@@ -1,19 +1,20 @@
 # -*- coding:utf-8 -*-
-# Train Q-Learning in cliff-walking environment
+# Train Sarsa in cliff-walking environment
 import math, os, time, sys
 import numpy as np
 import random
 import gym
-from agent import QLearningAgent
+from agent import SarsaAgent
 ##### START CODING HERE #####
 # This code block is optional. You can import other libraries or define your utility functions if necessary.
 from os import mkdir
 import pickle as pkl
+from plot import plot_path
 from plot_all_Q import plot_all_Q
 ##### END CODING HERE #####
 
 # construct the environment
-def q_plan(df, lr, decay_rate):
+def sarsa_plan(df, lr, decay_rate):
     env = gym.make("CliffWalking-v0")
     # get the size of action space 
     num_actions = env.action_space.n
@@ -24,13 +25,14 @@ def q_plan(df, lr, decay_rate):
     random.seed(RANDOM_SEED) 
     np.random.seed(RANDOM_SEED) 
 
-    ##### START CODING HERE #####
+    ####### START CODING HERE #######
+
     # construct the intelligent agent.
     decay = lambda eps: eps * decay_rate  # eps-decay schema
-    agent = QLearningAgent(all_actions, decay, disc_factor=df, learning_rate=lr)
+    agent = SarsaAgent(all_actions, decay, disc_factor=df, learning_rate=lr)
 
     t = round(time.time() % 1e6)
-    dir_name = f"cliff_walking_res/q_{str(df).split('.')[-1]}_{str(lr).split('.')[-1]}_{str(decay_rate).split('.')[-1]}_{t}"
+    dir_name = f"cliff_walking_res/sarsa_{str(df).split('.')[-1]}_{str(lr).split('.')[-1]}_{str(decay_rate).split('.')[-1]}_{t}"
     mkdir(dir_name)
     f_reward = open(f"{dir_name}/reward.txt", 'a')
     f_eps = open(f"{dir_name}/eps.txt", 'a')
@@ -43,25 +45,27 @@ def q_plan(df, lr, decay_rate):
         s = env.reset()
         # render env. You can remove all render() to turn off the GUI to accelerate training.
         # env.render()
+        # choose an action
+        a = agent.choose_action(s)
         # agent interacts with the environment
         for iter in range(500):
             # print(f"#epi: {episode}  #iter: {iter}")
-            # choose an action
-            a = agent.choose_action(s)
             s_, r, isdone, info = env.step(a)
             # env.render()
             # update the episode reward
             episode_reward += r
             # print(f"{s} {a} {s_} {r} {isdone}")
+            # choose an action
+            a_ = agent.choose_action(s_)
             # agent learns from experience
-            agent.learn(s, a, s_, r)
+            agent.learn(s, a, s_, r, a_)
             s = s_
+            a = a_
             if isdone:
                 # time.sleep(0.1)
                 break
-
-        # print('episode:', episode, 'episode_reward:', episode_reward, 'epsilon:', agent.epsilon)
-        if episode % 250 == 0 or episode == 999:
+        # print('episode:', episode, 'episode_reward:', episode_reward, 'epsilon:', agent.epsilon)  
+        if episode % 250 == 0:
             with open(f"{dir_name}/Q_{episode}.pkl", 'wb') as f:
                 pkl.dump(agent.Q, f)
 
@@ -69,9 +73,10 @@ def q_plan(df, lr, decay_rate):
         f_eps.write(f"{agent.epsilon}, ")
         f_reward.flush()
         f_eps.flush()
-    print('\ntraining over\n')
+        # print(agent.Q)
+    print('\ntraining over\n')   
 
-    # agent.plan(env, f"{dir_name}/path.txt", f"{dir_name}/Q_999.pkl")
+    agent.plan(env, f"{dir_name}/path.txt", f"{dir_name}/Q_999.pkl")
 
     f_reward.close()
     f_eps.close()
@@ -79,7 +84,10 @@ def q_plan(df, lr, decay_rate):
     # close the render window after training.
     env.close()
     plot_all_Q(dir_name)
+    plot_path(dir_name + '/path.txt', save=1)
 
-    ##### END CODING HERE #####
+    ####### END CODING HERE #######
 
 
+if __name__ == '__main__':
+    sarsa_plan(1, 0.1, 0.99999)

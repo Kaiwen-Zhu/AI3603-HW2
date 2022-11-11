@@ -61,7 +61,7 @@ class SarsaAgent(object):
         # reset env
         s = env.reset()
         # render env. You can remove all render() to turn off the GUI to accelerate training.
-        env.render()
+        # env.render()
         # choose an action
         a = self.choose_action(s, exploration=0)
         # agent interacts with the environment
@@ -69,7 +69,7 @@ class SarsaAgent(object):
             s_, r, isdone, info = env.step(a)
             f_path.write(f'{s}, {a}, {s_}\n')
             f_path.flush()
-            env.render()
+            # env.render()
             # update the reward
             reward += r
             # print(f"{s} {a} {s_} {r} {isdone}")
@@ -137,7 +137,7 @@ class QLearningAgent(object):
         # reset env
         s = env.reset()
         # render env. You can remove all render() to turn off the GUI to accelerate training.
-        env.render()
+        # env.render()
         # agent interacts with the environment
         while 1:
             # choose an action
@@ -145,7 +145,7 @@ class QLearningAgent(object):
             s_, r, isdone, info = env.step(a)
             f_path.write(f'{s}, {a}, {s_}\n')
             f_path.flush()
-            env.render()
+            # env.render()
             # update the episode reward
             reward += r
             # print(f"{s} {a} {s_} {r} {isdone}")
