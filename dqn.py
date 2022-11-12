@@ -81,7 +81,7 @@ if __name__ == "__main__":
     args = parse_args()
     run_name = f"{args.env_id}__{args.exp_name}__{args.seed}__{int(time.time())}"
     
-    """we utilize tensorboard yo log the training process"""
+    """we utilize tensorboard to log the training process"""
     writer = SummaryWriter(f"runs/{run_name}")
     writer.add_text(
         "hyperparameters",

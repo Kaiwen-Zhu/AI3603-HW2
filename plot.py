@@ -284,7 +284,7 @@ def plot_conv(dirname, save=0):
 
 
 if __name__ == '__main__':
-    # plot_reward_eps_path("sarsa_9_1_9999_86981", save=1)
+    plot_reward_eps_path("sarsa_9_1_9999_86981", save=1)
     # plot_Q_table("sarsa_9_1_9999_86981/Q_999.pkl", save=1)
-    plot_conv("2000_sarsa_9_1_9999_130318", save=1)
+    # plot_conv("sarsa_9_1_9999_227433", save=1)
     # plot_Q_table_dist("sarsa_9_1_9999_86981/Q_999.pkl", save=1)

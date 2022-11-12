@@ -51,17 +51,17 @@ class SarsaAgent(object):
         # return False
     
 
-    def plan(self, env, path_file_path, table_file_path):
+    def plan(self, env, path_file_path, render=0, record=0):
         """plan a path and output the path and Q-table to files"""
-        with open(table_file_path, 'wb') as f_table:
-            pkl.dump(self.Q, f_table)
         f_path = open(path_file_path, 'a')
 
-        reward = 0
+        if record:
+            env = gym.wrappers.RecordVideo(env, './video')
         # reset env
         s = env.reset()
-        # render env. You can remove all render() to turn off the GUI to accelerate training.
-        # env.render()
+        if render:
+            # render env. You can remove all render() to turn off the GUI to accelerate training.
+            env.render()
         # choose an action
         a = self.choose_action(s, exploration=0)
         # agent interacts with the environment
@@ -69,9 +69,9 @@ class SarsaAgent(object):
             s_, r, isdone, info = env.step(a)
             f_path.write(f'{s}, {a}, {s_}\n')
             f_path.flush()
-            # env.render()
+            if render:
+                env.render()
             # update the reward
-            reward += r
             # print(f"{s} {a} {s_} {r} {isdone}")
             # choose an action
             a_ = self.choose_action(s_, exploration=0)
@@ -127,17 +127,17 @@ class QLearningAgent(object):
         # return False
 
     
-    def plan(self, env, path_file_path, table_file_path):
+    def plan(self, env, path_file_path, render=0, record=0):
         """plan a path and output the path and Q-table to files"""
-        with open(table_file_path, 'wb') as f_table:
-            pkl.dump(self.Q, f_table)
         f_path = open(path_file_path, 'a')
 
-        reward = 0
+        if record:
+            env = gym.wrappers.RecordVideo(env, './video')
         # reset env
         s = env.reset()
-        # render env. You can remove all render() to turn off the GUI to accelerate training.
-        # env.render()
+        if render:
+            # render env. You can remove all render() to turn off the GUI to accelerate training.
+            env.render()
         # agent interacts with the environment
         while 1:
             # choose an action
@@ -145,9 +145,9 @@ class QLearningAgent(object):
             s_, r, isdone, info = env.step(a)
             f_path.write(f'{s}, {a}, {s_}\n')
             f_path.flush()
-            # env.render()
+            if render:
+                env.render()
             # update the episode reward
-            reward += r
             # print(f"{s} {a} {s_} {r} {isdone}")
             # agent learns from experience
             # self.learn(s, a, s_, r)

@@ -63,7 +63,7 @@ for episode in range(1000):
             break
 
     # print('episode:', episode, 'episode_reward:', episode_reward, 'epsilon:', agent.epsilon)
-    if episode % 100 == 0:
+    if episode % 100 == 0 or episode == 999:
         with open(f"{dir_name}/Q_{episode}.pkl", 'wb') as f:
             pkl.dump(agent.Q, f)
 
@@ -73,7 +73,7 @@ for episode in range(1000):
     f_eps.flush()
 print('\ntraining over\n')
 
-agent.plan(env, f"{dir_name}/path.txt", f"{dir_name}/Q_999.pkl")
+agent.plan(env, f"{dir_name}/path.txt", render=1, record=0)
 
 f_reward.close()
 f_eps.close()
