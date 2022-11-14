@@ -9,7 +9,6 @@ from agent import SarsaAgent
 # This code block is optional. You can import other libraries or define your utility functions if necessary.
 from os import mkdir
 import pickle as pkl
-from plot_all_Q import plot_all_Q
 ##### END CODING HERE #####
 
 # construct the environment
@@ -84,8 +83,6 @@ f_eps.close()
 
 # close the render window after training.
 env.close()
-plot_all_Q(dir_name)
-
 ####### END CODING HERE #######
 
 

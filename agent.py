@@ -4,7 +4,6 @@ import numpy as np
 import gym
 ##### START CODING HERE #####
 # This code block is optional. You can import other libraries or define your utility functions if necessary.
-import pickle as pkl
 ##### END CODING HERE #####
 
 # ------------------------------------------------------------------------------------------- #
@@ -52,7 +51,7 @@ class SarsaAgent(object):
     
 
     def plan(self, env, path_file_path, render=0, record=0):
-        """plan a path and output the path and Q-table to files"""
+        """plan a path and visualize the result"""
         f_path = open(path_file_path, 'a')
 
         if record:
@@ -128,7 +127,7 @@ class QLearningAgent(object):
 
     
     def plan(self, env, path_file_path, render=0, record=0):
-        """plan a path and output the path and Q-table to files"""
+        """plan a path and visualize the result"""
         f_path = open(path_file_path, 'a')
 
         if record:

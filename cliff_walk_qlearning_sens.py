@@ -30,7 +30,7 @@ def q_plan(df, lr, decay_rate):
     agent = QLearningAgent(all_actions, decay, disc_factor=df, learning_rate=lr)
 
     t = round(time.time() % 1e6)
-    dir_name = f"cliff_walking_res/q_{str(df).split('.')[-1]}_{str(lr).split('.')[-1]}_{str(decay_rate).split('.')[-1]}_{t}"
+    dir_name = f"CliffWalkingData/q_{str(df).split('.')[-1]}_{str(lr).split('.')[-1]}_{str(decay_rate).split('.')[-1]}_{t}"
     mkdir(dir_name)
     f_reward = open(f"{dir_name}/reward.txt", 'a')
     f_eps = open(f"{dir_name}/eps.txt", 'a')

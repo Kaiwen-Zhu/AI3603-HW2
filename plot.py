@@ -12,7 +12,6 @@ def plot_reward(file_path, save):
         vals = f.readline().split(', ')[:-1]
     vals = [float(val) for val in vals]
 
-    # plt.plot(np.arange(1000), vals)
     plt.scatter(np.arange(1000), vals, s=3)
     plt.xlabel('episode')
     plt.ylabel('reward')
@@ -173,7 +172,13 @@ def plot_Q_table(file_path, save=0):
         plt.show()
 
 
+def plot_all_Q(dir_name):
+    for filepath in glob(f"{dir_name}/Q_*.pkl"):
+        plot_Q_table(filepath, save=1)
+
+
 def plot_Q_table_dist(file_path, save=0):
+    """plot the rate of overestimation"""
     with open(file_path, 'rb') as f:
         Q_table = pkl.load(f)
 
@@ -195,9 +200,6 @@ def plot_Q_table_dist(file_path, save=0):
 
     for s in Q_table.keys():
         for a in Q_table[s].keys():
-            # print("r({},{})={}, Q({},{})={}, rate={}".format(
-            #     s, a, r(s,a), s, a, Q_table[s][a],
-            #     round((Q_table[s][a] - r(s, a)) / r(s, a) * 100)))
             Q_table[s][a] = round((Q_table[s][a] - r(s, a)) / r(s, a) * 100)
 
     plt.figure(figsize=(12, 4))
@@ -261,6 +263,7 @@ def plot_Q_table_dist(file_path, save=0):
 
 
 def plot_conv(dirname, save=0):
+    """plot the process of convergence of Q-values"""
     for filepath in glob(f"{dirname}/*_*.txt"):
         with open(filepath) as f:
             vals = f.readline().split(', ')[:-1]
@@ -285,6 +288,3 @@ def plot_conv(dirname, save=0):
 
 if __name__ == '__main__':
     plot_reward_eps_path("sarsa_9_1_9999_86981", save=1)
-    # plot_Q_table("sarsa_9_1_9999_86981/Q_999.pkl", save=1)
-    # plot_conv("sarsa_9_1_9999_227433", save=1)
-    # plot_Q_table_dist("sarsa_9_1_9999_86981/Q_999.pkl", save=1)
